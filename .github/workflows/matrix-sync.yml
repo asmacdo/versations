@@ -1,0 +1,80 @@
+---
+name: Sync Matrix chatroom messages
+
+
+on:
+  push:
+    branches: ["main"]
+# on:
+#   schedule:
+#     - cron: '0 * * * *'
+#
+env:
+  python-version: "3.10"
+jobs:
+  sync_messages:
+    runs-on: ubuntu-latst
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.python-version }}
+      - name: install matrix commander
+        run: python -m pip install matrix-commander
+
+      - name: Log in to matrix server
+        env:
+          MATRIX_HOMESERVER: ${{ secrets.MATRIX_HOMESERVER }}
+          MATRIX_HOMESERVER_DOMAIN: ${{ secrets.MATRIX_HOMESERVER_DOMAIN }}
+          MATRIX_ROOM: ${{ secreets.MATRIX_ROOM }}
+          MATRIX_USERNAME: ${{ secrets.MATRIX_USERNAME }}
+          MATRIX_PASSWORD: ${{ secrets.MATRIX_PASSWORD }}
+        run matrix-commander --config .secrets --login
+        # run: matrix-commander --login password --user-login "${MATRIX_USERNAME}" --password "${MATRIX_PASSWORD}" --homeserver "${MATRIX_HOMESERVER}" --device "syncbot" --room-default "${MATRIX_ROOM_ID}" -m "matrix-commander posted from CI"
+          #... cont from prev | (${GITHUB_REPOSITORY} / ${GITHUB_REF})"
+          #TODO(asmacdo) consolidate these args into a file or something
+          #https://stackoverflow.com/questions/841670/i-would-like-to-store-all-command-line-arguments-to-a-bash-script-into-a-single
+          #
+          #
+#function test3() {
+# echo "=== Test 3: invoke 2 REST API calls at once, more efficient ==="
+#     ARGS=(
+#         "--rest"
+#         # first triple of args for 1st REST call
+#         "GET"
+#         ""
+#         "__homeserver__/_matrix/client/versions"
+#         # second triple of args for 2nd REST call
+#         "POST"
+#         '{"msgtype":"m.text", "body":"hello"}'
+#         "__homeserver__/_matrix/client/r0/rooms/__room_id__/send/\
+# m.room.message?access_token=__access_token__"
+#     )
+#     echo "Using these args:" "${ARGS[@]}"
+#     matrix-commander "${ARGS[@]}"
+#     res=$?
+#     if [ "$res" == "0" ]; then
+#         echo "SUCCESS"
+#     else
+#         echo "FAILURE"
+#     fi
+# }
+#
+#
+# Get the room information such as room display name,
+#                         room alias, room creator, etc. for one or multiple
+#                         specified rooms. The included room 'display name' is
+#                         also referred to as 'room name' or incorrectly even as
+#                         room title. If one or more room ids are given, the
+#                         room informations of these rooms will be fetched. If
+#                         no room is specified, the room information for the
+#                         default room configured for matrix-commander is
+#                         fetched. As response room id, room display name, room
+#                         canonical alias, room topic, room creator, room
+#                         encryption are printed. One line per room will be
+#                         printed. Do not confuse this option with the options '
+#                         --get-display-name' and '--set-display-name', which
+#                         get/set the user display name, not the room display
+#                         name.
