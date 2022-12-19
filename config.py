@@ -6,7 +6,7 @@ def load_config_from_env():
       "user_id": "MATRIX_USERNAME",
       "device_id": "MATRIX_DEVICE_ID",
       "password": "MATRIX_PASSWORD",
-      "homeserver": "MATRIX_HOST",
+      "homeserver": "MATRIX_HOMESERVER",
       "room_id": "MATRIX_ROOM_ID",
       "store_path": "MATRIX_STORE_PATH",
    }
