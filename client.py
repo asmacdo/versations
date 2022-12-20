@@ -58,6 +58,7 @@ class VersationsClient(AsyncClient):
       """
       self._events_written += 1
       event_dt = datetime.fromtimestamp(event.server_timestamp/ 1000)
+      import pdb; pdb.set_trace()
       with open(os.path.join(self.store_path, event_dt.date().isoformat()), "a") as log:
          log.write("---------------------\n")
          try:
