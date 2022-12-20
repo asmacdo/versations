@@ -29,7 +29,7 @@ async def main():
    response = await client.sync()
 
    await client.close()
-   print(f"Sync complete! Exported {client._versations_saved} messages to disk")
+   print(f"Sync complete! Exported {client._events_written} events to disk")
 if __name__ == "__main__":
    # TODO(asmacdo) whats the diff for run vs eventloop run until complete
    # asyncio.run(main())

@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # TODO(asmacdo) blackify
-from nio import AsyncClient, LoginResponse, SyncResponse, MatrixRoom, RoomMessageText
+from nio import AsyncClient, LoginResponse, SyncResponse, MatrixRoom, RoomMessageText, Event
 
 class VersationsClient(AsyncClient):
    def __init__(self, homeserver, user="", device_id="", store_path="",
@@ -20,9 +20,12 @@ class VersationsClient(AsyncClient):
       # self.add_event_callback(self.cb_autojoin_room, InviteEvent)
 
       # Write each message to appropriate date-file
-      self.add_event_callback(self.write_versation, RoomMessageText)
-      self._versations_saved = 0
+      # self.add_event_callback(self.write_simple_messages, RoomMessageText)
+      # self._messages_written = 0
 
+      # Write all events
+      self.add_event_callback(self.write_all_events, Event)
+      self._events_written = 0
 
    async def authenticate(self, config):
       resp = await self.login(config["password"], device_name=config.get("sync-bot"))
@@ -32,21 +35,32 @@ class VersationsClient(AsyncClient):
          # TODO(asmacdo) better exception
          raise Exception("pass login failed")
 
-   async def write_versation(self, room: MatrixRoom, event: RoomMessageText):
+   # TODO(asmacdo) not used
+   async def write_simple_messages(self, room: MatrixRoom, event: RoomMessageText):
       """Callback to write a received message to disk.
 
       Arguments:
           room {MatrixRoom} -- Provided by nio
           event {RoomMessageText} -- Provided by nio
       """
-      self._versations_saved += 1
-
-      # TODO(asmacdo) encrpytion
-      # if event.decrypted:
-      #    encrypted_symbol = "🛡 "
-      # else:
-      #    encrypted_symbol = "⚠️ "
-
+      self._messages_written += 1
       event_dt = datetime.fromtimestamp(event.server_timestamp/ 1000)
       with open(os.path.join(self.store_path, event_dt.date().isoformat()), "a") as log:
          log.write(f"{event_dt.strftime('%H:%M:%S')} | {event.sender}: {event.body}\n")
+
+   # TODO(asmacdo) not used
+   async def write_all_events(self, room: MatrixRoom, event: Event):
+      """Callback to write a received message to disk.
+
+      Arguments:
+          room {MatrixRoom} -- Provided by nio
+          event {RoomMessageText} -- Provided by nio
+      """
+      self._events_written += 1
+      event_dt = datetime.fromtimestamp(event.server_timestamp/ 1000)
+      with open(os.path.join(self.store_path, event_dt.date().isoformat()), "a") as log:
+         log.write("---------------------\n")
+         try:
+            log.write(f"{event_dt.strftime('%H:%M:%S')} | {event.sender}: {event.body}\n")
+         except Exception as e:
+            log.write(f"EXCEPTION {e}")
