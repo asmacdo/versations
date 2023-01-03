@@ -1,46 +1,16 @@
-#
-# import asyncio
-# import getpass
-# import json
 import os
-# import sys
-# import traceback
-# import rich
-#
+import sys
+
+from datetime import datetime
+
+from colorama import Fore, Style
 from nio import (
     AsyncClient,
-#     AsyncClientConfig,
-#     exceptions,
-#     KeyVerificationCancel,
     KeyVerificationEvent,
-#     KeyVerificationKey,
-#     KeyVerificationMac,
-#     KeyVerificationStart,
-#     MatrixRoom,
-#     MegolmEvent,
-#     LocalProtocolError,
     LoginResponse,
-#     RedactionEvent,
-#     RedactedEvent,
-#     RoomEncryptionEvent,
-#     RoomGuestAccessEvent,
-#     RoomMemberEvent,
     RoomMessageText,
-#     RoomMessagesResponse,
-#     RoomNameEvent,
-#     SyncResponse,
-#     ToDeviceError,
 )
-#
-from datetime import datetime
-# from session import Session
-# from colorama import Fore, Style
-#
 
-# from client_callbacks import Callbacks
-from colorama import Fore, Style
-
-# file to store credentials in case you want to run program multiple times
 class VersationsClient(AsyncClient):
     def __init__(self, session, config=None, store_path=None):
         self.session = session
@@ -58,23 +28,8 @@ class VersationsClient(AsyncClient):
             room {MatrixRoom} -- Provided by nio
             event {RoomMessageText} -- Provided by nio
         """
-        # self._messages_written += 1
         event_dt = datetime.fromtimestamp(event.server_timestamp/ 1000)
         print(f"{event.sender}:{room.room_id}  {Fore.WHITE}{event_dt.strftime('%H:%M:%S')}: {Fore.MAGENTA}{event.body}{Style.RESET_ALL}")
-            # if isinstance(event, MegolmEvent):
-            #     if event.sender in self.device_store.users:
-            #         # if event.device_id in self.device_store.users.mapping.get(event.device_id):
-            #         print(f"{Fore.RED} {event.sender} {event.device_id}{Style.RESET_ALL}")
-            #     print("skipping event that was sent by deleted device")
-            # else:
-            #     if isinstance(event, RedactionEvent):
-            #     elif isinstance(event, RedactedEvent):
-            #     elif isinstance(event, RoomMemberEvent):
-            #     elif isinstance(event, RoomNameEvent):
-            #     elif isinstance(event, RoomEncryptionEvent):
-            #     elif isinstance(event, RoomGuestAccessEvent):
-            #     else:
-                    # raise
         os.makedirs(os.path.join(self.store_path, room.display_name), exist_ok=True)
         with open(os.path.join(self.store_path, room.display_name, event_dt.date().isoformat()), "a") as log:
            log.write(f"{event_dt.strftime('%H:%M:%S')} | {event.sender}: {event.body}\n")
@@ -89,7 +44,7 @@ class VersationsClient(AsyncClient):
 
     async def password_login(self):
         if not self.session.password:
-            print(f"{Fore.RED}Needed password, didnt have it. \n\n{Fore.GREEN}{HELP}{Style.RESET_ALL}")
+            print(f"{Fore.RED}Needed password, didnt have it. \n\n{Fore.GREEN}{Style.RESET_ALL}")
             sys.exit(1)
 
         resp = await self.login(password=self.session.password)
